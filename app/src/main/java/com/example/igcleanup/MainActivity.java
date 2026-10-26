@@ -40,6 +40,27 @@ public class MainActivity extends Activity {
     }
 
     private class InstagramBridge {
+        @JavascriptInterface public void openInstagramFollowing(String username) {
+            if (username == null || !Pattern.matches("[A-Za-z0-9._]{1,30}", username)) {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Please enter a valid Instagram username.", Toast.LENGTH_SHORT).show());
+                return;
+            }
+            runOnUiThread(() -> {
+                Uri uri = Uri.parse("https://www.instagram.com/" + username + "/following/");
+                Intent appIntent = new Intent(Intent.ACTION_VIEW, uri);
+                appIntent.setPackage("com.instagram.android");
+                try {
+                    startActivity(appIntent);
+                } catch (Exception appNotAvailable) {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    } catch (Exception noHandler) {
+                        Toast.makeText(MainActivity.this, "Instagram or a browser could not be opened.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+
         @JavascriptInterface public void openInstagramProfile(String username) {
             if (username == null || !Pattern.matches("[A-Za-z0-9._]{1,30}", username)) {
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Please enter a valid Instagram username.", Toast.LENGTH_SHORT).show());
